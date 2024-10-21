@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Member Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Member Management</h1>
+
+    <h2>Active Members</h2>
+    <table class="table table-responsive table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Rank</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in active_users %}
+            <tr>
+                <form method="POST" action="{{ url_for('members_administration') }}" onsubmit="return confirmUpdate(this);">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <td>
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <input type="text" name="username" class="form-control form-control-sm" value="{{ user.username }}" required>
+                    </td>
+                    <td><input type="text" name="first_name" class="form-control form-control-sm" value="{{ user.first_name }}" required></td>
+                    <td><input type="text" name="last_name" class="form-control form-control-sm" value="{{ user.last_name }}" required></td>
+                    <td><input type="email" name="email" class="form-control form-control-sm" value="{{ user.email }}" required></td>
+                    <td>
+                        <select name="role" class="form-control form-control-sm" required>
+                            {% for role in roles %}
+                            <option value="{{ role.value }}" {% if user.role == role %}selected{% endif %}>{{ role.value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="rank" class="form-control form-control-sm" required>
+                            {% for rank in ranks %}
+                            <option value="{{ rank.value }}" {% if user.rank == rank %}selected{% endif %}>{{ rank.value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button type="submit" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Update Member">
+                                <i class="fas fa-check"></i> Update
+                            </button>
+                            <button type="submit" name="set_inactive" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Set Inactive">
+                                <i class="fas fa-user-slash"></i> Inactive
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setNewPassword(this.form)" data-toggle="tooltip" data-placement="top" title="Set New Password">
+                                <i class="fas fa-key"></i> New Password
+                            </button>
+                        </div>
+                        <input type="hidden" name="new_password" class="form-control" placeholder="Enter new password">
+                    </td>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Inactive Members</h2>
+    <table class="table table-responsive table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Rank</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in inactive_users %}
+            <tr>
+                <form method="POST" action="{{ url_for('members_administration') }}" onsubmit="return confirmUpdate(this);">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <td>
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <input type="text" name="username" class="form-control form-control-sm" value="{{ user.username }}" required>
+                    </td>
+                    <td><input type="text" name="first_name" class="form-control form-control-sm" value="{{ user.first_name }}" required></td>
+                    <td><input type="text" name="last_name" class="form-control form-control-sm" value="{{ user.last_name }}" required></td>
+                    <td><input type="email" name="email" class="form-control form-control-sm" value="{{ user.email }}" required></td>
+                    <td>
+                        <select name="role" class="form-control form-control-sm" required>
+                            {% for role in roles %}
+                            <option value="{{ role.value }}" {% if user.role == role %}selected{% endif %}>{{ role.value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="rank" class="form-control form-control-sm" required>
+                            {% for rank in ranks %}
+                            <option value="{{ rank.value }}" {% if user.rank == rank %}selected{% endif %}>{{ rank.value }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button type="submit" class="btn btn-success btn-sm" data-toggle="tooltip" data-placement="top" title="Update Member">
+                                <i class="fas fa-check"></i> Update
+                            </button>
+                            <button type="submit" name="set_active" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="top" title="Set Active">
+                                <i class="fas fa-user-check"></i> Active
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="setNewPassword(this.form)" data-toggle="tooltip" data-placement="top" title="Set New Password">
+                                <i class="fas fa-key"></i> New Password
+                            </button>
+                        </div>
+                        <input type="hidden" name="new_password" class="form-control" placeholder="Enter new password">
+                    </td>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function confirmUpdate(form) {
+        const username = form.username.value;
+        const firstName = form.first_name.value;
+        const lastName = form.last_name.value;
+        const email = form.email.value;
+        const role = form.role.options[form.role.selectedIndex].text;
+        const rank = form.rank.options[form.rank.selectedIndex].text;
+
+        return confirm(`Are you sure you want to update the user with the following details?\n\nUsername: ${username}\nFirst Name: ${firstName}\nLast Name: ${lastName}\nEmail: ${email}\nRole: ${role}\nRank: ${rank}`);
+    }
+
+    function setNewPassword(form) {
+        const newPassword = prompt("Enter new password:");
+        if (newPassword) {
+            form.new_password.value = newPassword;
+            form.submit();
+        }
+    }
+</script>
+{% endblock %}

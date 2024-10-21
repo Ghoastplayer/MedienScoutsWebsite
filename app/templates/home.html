@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Willkommen bei MedienScouts{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Willkommen bei MedienScouts!</h1>
+    <p>
+        Die MedienScouts spielen eine entscheidende Rolle in der modernen Medienbildung. In einer Welt, in der digitale
+        Medien einen immer größeren Teil unseres Lebens einnehmen, ist es unser Ziel, Schulen dabei zu unterstützen,
+        einen sicheren und verantwortungsvollen Umgang mit diesen Technologien zu fördern. Unser Team aus engagierten
+        Experten bietet umfassende Unterstützung bei allen Fragen rund um den digitalen Alltag.
+    </p>
+    <p>
+        Ob bei der Nutzung sozialer Medien, dem Schutz persönlicher Daten oder der Bekämpfung von Cybermobbing – die
+        MedienScouts stehen Schülern und Lehrern mit Rat und Tat zur Seite. Gemeinsam gestalten wir die digitale Zukunft
+        verantwortungsbewusst und sicher.
+    </p>
+
+    <!-- Call-to-action button to book a ticket -->
+    <a href="{{ url_for('send_ticket') }}" class="btn btn-primary btn-lg mt-3">
+        <i class="fas fa-ticket-alt"></i> Jetzt ein Ticket senden
+    </a>
+</div>
+
+<hr class="my-5">
+
+<!-- Section for Offers -->
+<div class="container">
+    <h2>Unsere Angebote</h2>
+    <p>
+        Wir bieten eine Vielzahl von Weiterbildungsangeboten, die speziell auf die Bedürfnisse von Schulen zugeschnitten
+        sind. Egal, ob Sie eine Schulung für Lehrkräfte oder ein spezielles Programm für Schüler benötigen – wir haben
+        das passende Angebot. Unsere maßgeschneiderten Fortbildungen umfassen Themen wie digitale Selbstverteidigung,
+        Datenschutz, sichere Internetnutzung und vieles mehr.
+    </p>
+    <p>
+        Unsere Fortbildungen sind praxisnah und interaktiv, sodass die Teilnehmer das Gelernte direkt anwenden können.
+        Durch unsere langjährige Erfahrung in der Medienbildung sind wir in der Lage, ein hohes Niveau an Expertise zu
+        bieten und Ihre Schule optimal auf die Herausforderungen der digitalen Welt vorzubereiten.
+    </p>
+</div>
+
+<hr class="my-5">
+
+<!-- Section for Members -->
+<div class="container">
+    <h2>Unsere Mitglieder</h2>
+    <p>
+        Aktuell engagieren sich <strong>{{ member_count }}</strong> Mitglieder aktiv für die Medienbildung in
+        verschiedenen Projekten und Schulprogrammen. Unsere Mitglieder kommen aus den unterschiedlichsten Bereichen und
+        bringen eine Fülle von Wissen und Erfahrung mit, die sie in ihre Arbeit mit Schülern und Lehrkräften einfließen
+        lassen.
+    </p>
+    <p>
+        Wir sind stolz auf unser wachsendes Netzwerk von engagierten MedienScouts, die alle ein gemeinsames Ziel
+        verfolgen: Schülern und Lehrern dabei zu helfen, digitale Medien verantwortungsbewusst zu nutzen. Wenn Sie auch
+        Teil dieser Bewegung werden möchten, zögern Sie nicht – wir freuen uns auf Sie!
+    </p>
+</div>
+{% endblock %}

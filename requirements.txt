@@ -1,0 +1,9 @@
+Flask~=3.0.3
+Flask-Login~=0.6.3
+Werkzeug~=3.0.4
+app~=0.0.1
+pymysql~=1.1.1
+WTForms~=3.1.2
+flask-talisman~=1.1.0
+bleach~=6.1.0
+SQLAlchemy~=2.0.35

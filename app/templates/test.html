@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+    <html lang="de">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333; padding: 20px; }}
+            .email-header {{ background-color: #4CAF50; color: white; padding: 10px; text-align: center; }}
+            .email-content {{ padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }}
+            .btn {{ display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
+            .email-footer {{ font-size: 12px; color: #777; text-align: center; margin-top: 20px; }}
+        </style>
+    </head>
+    <body>
+        <div class="email-header">
+            <h1>Willkommen, {name}!</h1>
+        </div>
+        <div class="email-content">
+            <p>Hallo {name},</p>
+            <p>Wir freuen uns, dass wir weitere Unterstützung erhalten haben. Wenn du möchtest, kannst du direkt mit dem Bearbeiten von Tickets anfangen.</p>
+            <p>Oder, wenn du möchtest, mach dich zunächst mit unserem Tool vertraut.</p>
+            <p>Falls du Fragen hast, stelle sie einfach im Forum: <a href="{forum_link}" class="btn">Zum Forum</a></p>
+        </div>
+        <div class="email-footer">
+            <p>&copy; 2024 MedienScouts | Alle Rechte vorbehalten.</p>
+        </div>
+    </body>
+    </html>
+    """
