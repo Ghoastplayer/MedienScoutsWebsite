@@ -457,32 +457,49 @@ from app.models import User, db, RoleEnum, RankEnum
 @admin_required
 def members_administration():
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        user = User.query.get(user_id)
-        if user:
-            user.username = request.form.get('username')
-            user.first_name = request.form.get('first_name')
-            user.last_name = request.form.get('last_name')
-            user.email = request.form.get('email')
-            user.role = request.form.get('role')
-            user.rank = request.form.get('rank')
-            if 'set_inactive' in request.form:
-                user.active = False
-            elif 'set_active' in request.form:
-                user.active = True
-            new_password = request.form.get('new_password')
-            if new_password:
-                user.set_password(new_password)  # Assuming `set_password` is a method in your User model
+        if 'create_user' in request.form:
+            new_user = User(
+                username=request.form.get('new_username'),
+                first_name=request.form.get('new_first_name'),
+                last_name=request.form.get('new_last_name'),
+                email=request.form.get('new_email'),
+                role=request.form.get('new_role'),
+                rank=request.form.get('new_rank'),
+                active=True,
+                active_from=datetime.utcnow()
+            )
+            new_user.set_password(request.form.get('new_password'))
+            db.session.add(new_user)
             db.session.commit()
-            flash('User updated successfully.', 'success')
+            flash('New user created successfully.', 'success')
         else:
-            flash('User not found.', 'danger')
+            user_id = request.form.get('user_id')
+            user = User.query.get(user_id)
+            if user:
+                user.username = request.form.get('username')
+                user.first_name = request.form.get('first_name')
+                user.last_name = request.form.get('last_name')
+                user.email = request.form.get('email')
+                user.role = request.form.get('role')
+                user.rank = request.form.get('rank')
+                if 'set_inactive' in request.form:
+                    user.active = False
+                    user.active_until = datetime.utcnow()
+                elif 'set_active' in request.form:
+                    user.active = True
+                    user.active_until = None
+                new_password = request.form.get('new_password')
+                if new_password:
+                    user.set_password(new_password)
+                db.session.commit()
+                flash('User updated successfully.', 'success')
+            else:
+                flash('User not found.', 'danger')
         return redirect(url_for('members_administration'))
 
     active_users = User.query.filter_by(active=True).all()
     inactive_users = User.query.filter_by(active=False).all()
     return render_template('members_administration.html', active_users=active_users, inactive_users=inactive_users, roles=RoleEnum, ranks=RankEnum)
-
 
 @app.route('/impressum')
 def impressum():
@@ -492,7 +509,6 @@ def impressum():
 #TODO: User benachrichtigen bei neuer Nachricht
 @app.route('/ticket/<token>', methods=['GET', 'POST'])
 def view_ticket(token):
-    ticket = None
     ticket_type = None
     for TicketModel, type_name in [(ProblemTicket, 'problem'), (TrainingTicket, 'training'), (MiscTicket, 'misc')]:
         ticket = TicketModel.verify_token(token)

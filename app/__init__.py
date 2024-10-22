@@ -5,7 +5,6 @@ from flask_talisman import Talisman
 from flask import Flask
 from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
-from redis import Redis
 from sqlalchemy import text  # Import text function
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address

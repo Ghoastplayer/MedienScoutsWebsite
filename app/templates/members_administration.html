@@ -124,6 +124,56 @@
         </tbody>
     </table>
 </div>
+
+<h2>Create New Member</h2>
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('members_administration') }}" onsubmit="return confirmCreateUser(this);">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="new_username">Username</label>
+                    <input type="text" name="new_username" class="form-control" id="new_username" required placeholder="Enter username">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="new_first_name">First Name</label>
+                    <input type="text" name="new_first_name" class="form-control" id="new_first_name" required placeholder="Enter first name">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="new_last_name">Last Name</label>
+                    <input type="text" name="new_last_name" class="form-control" id="new_last_name" required placeholder="Enter last name">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="new_email">Email</label>
+                    <input type="email" name="new_email" class="form-control" id="new_email" required placeholder="Enter email">
+                </div>
+                <div class="form-group col-md-1">
+                    <label for="new_role">Role</label>
+                    <select name="new_role" class="form-control" id="new_role" required>
+                        {% for role in roles %}
+                        <option value="{{ role.value }}">{{ role.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group col-md-1">
+                    <label for="new_rank">Rank</label>
+                    <select name="new_rank" class="form-control" id="new_rank" required>
+                        {% for rank in ranks %}
+                        <option value="{{ rank.value }}">{{ rank.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="new_password">Password</label>
+                    <input type="password" name="new_password" class="form-control" id="new_password" required placeholder="Enter password">
+                </div>
+            </div>
+            <button type="submit" name="create_user" class="btn btn-primary">Create Member</button>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -145,6 +195,17 @@
             form.new_password.value = newPassword;
             form.submit();
         }
+    }
+
+    function confirmCreateUser(form) {
+        const username = form.new_username.value;
+        const firstName = form.new_first_name.value;
+        const lastName = form.new_last_name.value;
+        const email = form.new_email.value;
+        const role = form.new_role.options[form.new_role.selectedIndex].text;
+        const rank = form.new_rank.options[form.new_rank.selectedIndex].text;
+
+        return confirm(`Are you sure you want to create a new user with the following details?\n\nUsername: ${username}\nFirst Name: ${firstName}\nLast Name: ${lastName}\nEmail: ${email}\nRole: ${role}\nRank: ${rank}`);
     }
 </script>
 {% endblock %}
