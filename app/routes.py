@@ -10,7 +10,7 @@ from app.decorators import admin_required
 from app.forms import MessageForm, LoginForm
 from app.models import Message, MiscTicket, TrainingTicket, ProblemTicket, ProblemTicketUser, \
     TrainingTicketUser, MiscTicketUser, TicketHistory
-from email_tools import send_ticket_link
+from email_tools import send_ticket_link, notify_admin
 
 
 @app.before_request
@@ -131,7 +131,17 @@ def claim_ticket(ticket_id):
 def request_help(ticket_id):
     ticket_type = request.form.get('ticket_type')
     print(f'Ticket Type: {ticket_type}')
-    # TODO: Implement logic to handle help request for the ticket
+    if ticket_type == 'problem':
+        ticket = ProblemTicket.query.get(ticket_id)
+    elif ticket_type == 'training':
+        ticket = TrainingTicket.query.get(ticket_id)
+    elif ticket_type == 'misc':
+        ticket = MiscTicket.query.get(ticket_id)
+    else:
+        flash('Invalid ticket type.', 'danger')
+        return redirect(url_for('ticket_details', ticket_id=ticket_id, ticket_type=ticket_type))
+
+    notify_admin(ticket, ticket_type, 'Help is requested for the following ticket:')
     flash('Help request has been sent for ticket ID: {}'.format(ticket_id), 'info')
     return redirect(url_for('ticket_details', ticket_id=ticket_id, ticket_type=ticket_type))
 

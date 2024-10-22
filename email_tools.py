@@ -120,7 +120,48 @@ ticket_link_template = EmailTemplate(
     """
 )
 
+notify_admin_template = EmailTemplate(
+    subject="Admin Notification",
+    template_content="""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: Arial, sans-serif; background-color: #f9f9f9; color: #333; padding: 20px; }}
+            .email-header {{ background-color: #4CAF50; color: white; padding: 10px; text-align: center; }}
+            .email-content {{ padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }}
+            .btn {{ display: inline-block; padding: 10px 20px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
+            .email-footer {{ font-size: 12px; color: #777; text-align: center; margin-top: 20px; }}
+        </style>
+    </head>
+    <body>
+        <div class="email-header">
+            <h1>New Ticket Notification</h1>
+        </div>
+            <div class="email-content">
+                <p>Hello Admin,</p>
+                <p>{message}</p>
+                <p><a href="{link}" class="btn">View Ticket</a></p>
+            </div>
+        <div class="email-footer">
+            <p>&copy; 2024 Medienscouts | All rights reserved.</p>
+        </div>
+    </body>
+    </html>
+    """
+)
+
+
 def send_ticket_link(ticket):
     token = ticket.generate_token()
     link = url_for('view_ticket', token=token, _external=True)
     send_email(ticket_link_template, ticket.email, link=link)
+
+
+def notify_admin(ticket, ticket_type, message):
+    from app.models import User
+    admin = User.query.filter_by(role='ADMIN', active=True).first()
+    link = url_for('ticket_details', ticket_id=ticket.id, ticket_type=ticket_type, _external=True)
+    print(link)
+    send_email(notify_admin_template, admin.email, message=message, link=link)

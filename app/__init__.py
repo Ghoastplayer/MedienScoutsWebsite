@@ -17,8 +17,6 @@ import config
 app = Flask(__name__)
 app.config.from_object(config)
 
-redis_client = Redis.from_url(app.config['REDIS_URL'])
-
 csrf = CSRFProtect(app)
 
 csp = {
@@ -58,9 +56,8 @@ talisman = Talisman(app, content_security_policy=csp)
 
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri=app.config['REDIS_URL'],
     app=app,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["100 per hour"]
 )
 limiter.limit("10 per minute")(app.route('/login', methods=['POST']))
 
