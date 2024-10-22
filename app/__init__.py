@@ -5,7 +5,10 @@ from flask_talisman import Talisman
 from flask import Flask
 from flask_login import LoginManager, current_user
 from flask_wtf import CSRFProtect
+from redis import Redis
 from sqlalchemy import text  # Import text function
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from .models import db, User, ProblemTicket, ProblemTicketUser, TicketHistory, TrainingTicket, TrainingTicketUser, \
     MiscTicket, MiscTicketUser
@@ -13,6 +16,8 @@ import config
 
 app = Flask(__name__)
 app.config.from_object(config)
+
+redis_client = Redis.from_url(app.config['REDIS_URL'])
 
 csrf = CSRFProtect(app)
 
@@ -50,6 +55,14 @@ csp = {
 
 # Initialize Talisman with the CSP
 talisman = Talisman(app, content_security_policy=csp)
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri=app.config['REDIS_URL'],
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
+limiter.limit("10 per minute")(app.route('/login', methods=['POST']))
 
 db.init_app(app)
 
