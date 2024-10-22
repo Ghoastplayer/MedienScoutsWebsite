@@ -8,27 +8,25 @@ setTimeout(function() {
     });
 }, 5000);
 
-// Auto Logout after 3min in background
-let logoutTimer;
+// Auto logout after a period of inactivity
+    let idleTime = 0;
+    const maxIdleTime = 30 * 60 * 1000; // 30 minutes
 
-const isAuthenticated = JSON.parse('{{ current_user.is_authenticated | tojson | safe }}');
-
-function resetLogoutTimer() {
-    clearTimeout(logoutTimer);
-    logoutTimer = setTimeout(logoutUser, 180000); // 180000 ms = 3 minutes
-}
-
-function logoutUser() {
-    if (isAuthenticated) {
-        window.location.href = "{{ url_for('logout') }}";
+    function resetIdleTime() {
+        idleTime = 0;
     }
-}
 
-// Reset the timer on any of these events
-window.onload = resetLogoutTimer;
-document.onmousemove = resetLogoutTimer;
-document.onkeypress = resetLogoutTimer;
-document.onscroll = resetLogoutTimer;
-document.onclick = resetLogoutTimer;
+    window.onload = function() {
+        // Increment the idle time counter every minute
+        setInterval(timerIncrement, 60000); // 1 minute
 
-window.onload = console.log('base_scripts.js loaded');
+        // Reset the idle timer on mouse movement or key press
+        window.onmousemove = resetIdleTime;
+        window.onkeypress = resetIdleTime;
+    };
+
+    function timerIncrement() {
+        idleTime += 60000; // 1 minute
+        if (idleTime >= maxIdleTime) {
+            window.location.href = "{{ url_for('logout') }}";
+        }

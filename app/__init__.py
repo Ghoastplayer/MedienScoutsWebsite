@@ -12,7 +12,6 @@ from .models import db, User, ProblemTicket, ProblemTicketUser, TicketHistory, T
 import config
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
 app.config.from_object(config)
 
 csrf = CSRFProtect(app)

@@ -1,7 +1,9 @@
 import enum
 
+from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from itsdangerous import URLSafeSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from sqlalchemy import DateTime
@@ -70,6 +72,20 @@ class ProblemTicket(db.Model):
     photo = db.Column(db.String(200), nullable=True)  # Assuming file path stored
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status_id = db.Column(db.Integer, db.ForeignKey('ticket_status.id'), default=1)  # Default to "open"
+    status = db.relationship('TicketStatus', backref='problem_tickets')
+
+    def generate_token(self):
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'ticket_id': self.id})
+
+    @staticmethod
+    def verify_token(token):
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return ProblemTicket.query.get(data['ticket_id'])
 
 class TrainingTicket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -80,6 +96,20 @@ class TrainingTicket(db.Model):
     proposed_date = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status_id = db.Column(db.Integer, db.ForeignKey('ticket_status.id'), default=1)
+    status = db.relationship('TicketStatus', backref='training_tickets')
+
+    def generate_token(self):
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'ticket_id': self.id})
+
+    @staticmethod
+    def verify_token(token):
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return ProblemTicket.query.get(data['ticket_id'])
 
 class MiscTicket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,6 +119,20 @@ class MiscTicket(db.Model):
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status_id = db.Column(db.Integer, db.ForeignKey('ticket_status.id'), default=1)
+    status = db.relationship('TicketStatus', backref='misc_tickets')
+
+    def generate_token(self):
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'ticket_id': self.id})
+
+    @staticmethod
+    def verify_token(token):
+        s = URLSafeSerializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return ProblemTicket.query.get(data['ticket_id'])
 
 class ProblemTicketUser(db.Model):
     ticket_user_id = db.Column(db.Integer, primary_key=True)

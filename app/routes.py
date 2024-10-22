@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 
@@ -10,7 +10,12 @@ from app.decorators import admin_required
 from app.forms import MessageForm, LoginForm
 from app.models import User, db, Message, MiscTicket, TrainingTicket, ProblemTicket, ProblemTicketUser, \
     TrainingTicketUser, MiscTicketUser, TicketHistory
+from email_tools import send_ticket_link
 
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 @app.route('/')
 def home():
@@ -297,6 +302,9 @@ def send_ticket():
 
         db.session.commit()
 
+        # Generate token and send email with the link
+        send_ticket_link(ticket)
+
         flash(f'Ticket submitted successfully! Type: {ticket_type}', 'success')
         return redirect(url_for('home'))
 
@@ -469,6 +477,29 @@ def members_administration():
 def impressum():
     return render_template('impressum.html')
 
+@app.route('/ticket/<token>', methods=['GET', 'POST'])
+def view_ticket(token):
+    ticket = None
+    ticket_type = None
+    for TicketModel, type_name in [(ProblemTicket, 'problem'), (TrainingTicket, 'training'), (MiscTicket, 'misc')]:
+        ticket = TicketModel.verify_token(token)
+        if ticket:
+            ticket_type = type_name
+            break
+
+    if not ticket:
+        flash('Invalid or expired token', 'danger')
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        response_message = request.form.get('response_message')
+        log_ticket_message(ticket_type, ticket.id, response_message, 'non-member')
+        flash('Your response has been submitted.', 'success')
+        return redirect(url_for('view_ticket', token=token))
+
+    ticket_history = TicketHistory.query.filter_by(ticket_type=ticket_type, ticket_id=ticket.id).order_by(TicketHistory.created_at).all()
+
+    return render_template('view_ticket.html', ticket=ticket, token=token, ticket_history=ticket_history)
 def log_ticket_message(ticket_type, ticket_id, message, author_type):
     history_entry = TicketHistory(
         ticket_type=ticket_type,
